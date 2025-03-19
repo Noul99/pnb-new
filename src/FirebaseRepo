@@ -40,6 +40,30 @@ class FirebaseUtil {
     }
   }
 
+  static async updateDocument(collection, docId, data) {
+    try {
+      // Validate inputs
+      if (!collection || typeof collection !== 'string') {
+        throw new Error('Invalid collection path');
+      }
+      
+      if (!docId || typeof docId !== 'string') {
+        throw new Error('Invalid document ID');
+      }
+
+      // Reference to the document
+      const docRef = doc(db, collection, docId);
+      
+      // Update the document
+      await updateDoc(docRef, data);
+      
+      return { state: 'success', message: 'Document updated successfully' };
+    } catch (error) {
+      console.error("Error updating document:", error);
+      return { state: 'error', error: error.message };
+    }
+  }
+
   static async updateAnyModel(path, documentId, updatedData) {
     try {
       // Validate inputs

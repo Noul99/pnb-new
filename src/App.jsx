@@ -9,6 +9,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Simulate loading
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -23,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<FirstPage />} />
           <Route path="/second" element={<SecondPage />} />
+          <Route path="/second/:documentId" element={<SecondPage />} />
           <Route path="/success" element={<SuccessPage />} />
         </Routes>
       )}

