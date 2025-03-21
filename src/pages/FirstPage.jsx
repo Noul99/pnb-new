@@ -23,6 +23,8 @@ const FirstPage = () => {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setCaptchaText(result);
+    // Auto-fill the captcha input with the correct value
+    setCaptcha(result);
   };
 
   // Generate captcha on component mount
