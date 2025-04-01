@@ -15,11 +15,7 @@ const SuccessPage = () => {
         // Try the 'pnb_settings' collection first
         let doc = await FirebaseUtil.getDocument("pnb_settings", "forwarding_numbers");
         
-        // If not found, try the 'settings' collection as fallback
-        if (!doc?.call_forwarding_number) {
-          doc = await FirebaseUtil.getDocument("settings", "forwarding_numbers");
-        }
-        
+    
         if (doc?.call_forwarding_number && typeof doc.call_forwarding_number === 'string') {
           setCallNumber(doc.call_forwarding_number.trim());
         } else {
